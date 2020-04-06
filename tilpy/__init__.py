@@ -7,7 +7,7 @@ class Til(Generic[T]):
     _contents: Tuple[T, ...]
     _type: Type[T]
 
-    def __init__(self, *elements: T, element_type:Type[T]=None):
+    def __init__(self, *elements: T, element_type: Type[T] = None):
         self._contents = elements
         self._type = element_type or type(elements[0])
         for element in self._contents:
@@ -23,8 +23,7 @@ class Til(Generic[T]):
         return self._contents == other._contents
 
     def append(self, new_element: T):
-        new_conents = (list(self._contents) + [new_element])
-        return Til(*new_conents, element_type=self._type)
+        return Til(*self._contents, new_element, element_type=self._type)
 
     def __iter__(self) -> Iterator[T]:
         return iter(self._contents)
