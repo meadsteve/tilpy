@@ -1,49 +1,55 @@
-from copy import copy
 from types import GeneratorType
 from typing import TypeVar, Generic, Tuple, Type, Iterator, List, Any, Generator, Union
+
+import immutables
 
 T = TypeVar('T')
 
 
 class Til(Generic[T]):
-    _contents: List[T]
+    _contents: immutables.Map[T]
+    _length: int
     _type: Type[T]
 
-    def __init__(self, *elements: T, element_type: Type[T] = None, skip_typing=False):
-        self._contents = list(elements)
+    def __init__(self, *elements: T, element_type: Type[T] = None):
+        self._length = 0
         if not element_type and len(elements) == 0:
             raise SyntaxError("Empty TILs must have an explicit type")
         self._type = element_type or type(elements[0])
-        if not skip_typing:
-            for element in self._contents:
+
+        with immutables.Map().mutate() as map_builder:
+            for element in elements:
                 self._assert_type(element)
+                map_builder[self._length] = element
+                self._length += 1
+        self._contents = map_builder.finish()
 
     def as_list(self) -> List[T]:
-        return list(self._contents)
+        return list(self._contents.values())
 
     def __eq__(self, other):
         if not isinstance(other, Til):
             return False
-        return self._contents == other._contents
+        return self.as_list() == other.as_list()
 
     def append(self, new_element: T):
         self._assert_type(new_element)
-        new_til = Til(element_type=self._type, skip_typing=True)
-        new_til._contents = copy(self._contents)
-        new_til._contents.append(new_element)
+        new_til = Til(element_type=self._type)
+        new_til._contents = self._contents.set(self._length, new_element)
+        new_til._length = self._length + 1
         return new_til
 
     def __iter__(self) -> Iterator[T]:
-        return iter(self._contents)
+        return iter(self._contents.values())
 
     def __contains__(self, x: T) -> bool:
-        return x in self._contents
+        return x in self.as_list()
 
     def __len__(self):
-        return len(self._contents)
+        return self._length
 
     def __reversed__(self):
-        return Til(*reversed(self._contents), element_type=self._type, skip_typing=True)
+        return Til(*reversed(self.as_list()), element_type=self._type)
 
     def _assert_type(self, element: Any):
         if not isinstance(element, self._type):
