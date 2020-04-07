@@ -1,3 +1,4 @@
+from copy import copy
 from types import GeneratorType
 from typing import TypeVar, Generic, Tuple, Type, Iterator, List, Any, Generator, Union
 
@@ -5,11 +6,11 @@ T = TypeVar('T')
 
 
 class Til(Generic[T]):
-    _contents: Tuple[T, ...]
+    _contents: List[T]
     _type: Type[T]
 
     def __init__(self, *elements: T, element_type: Type[T] = None, skip_typing=False):
-        self._contents = elements
+        self._contents = list(elements)
         if not element_type and len(elements) == 0:
             raise SyntaxError("Empty TILs must have an explicit type")
         self._type = element_type or type(elements[0])
@@ -27,7 +28,10 @@ class Til(Generic[T]):
 
     def append(self, new_element: T):
         self._assert_type(new_element)
-        return Til(*self._contents, new_element, element_type=self._type, skip_typing=True)
+        new_til = Til(element_type=self._type, skip_typing=True)
+        new_til._contents = copy(self._contents)
+        new_til._contents.append(new_element)
+        return new_til
 
     def __iter__(self) -> Iterator[T]:
         return iter(self._contents)
