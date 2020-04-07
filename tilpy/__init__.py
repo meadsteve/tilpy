@@ -33,5 +33,5 @@ class Til(Generic[T]):
         return x in self._contents
 
     def _assert_type(self, element: Any):
-        if type(element) is not self._type:
+        if not isinstance(element, self._type):
             raise TypeError("Elements must all be the same type")

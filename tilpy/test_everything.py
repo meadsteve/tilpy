@@ -3,6 +3,14 @@ import pytest
 from tilpy import Til
 
 
+class ParentType:
+    pass
+
+
+class ChildType(ParentType):
+    pass
+
+
 def test_construction_from_numbers():
     assert Til(2, 7, 8) == Til(2, 7, 8)
 
@@ -21,6 +29,11 @@ def test_adding_elements_is_immutable():
 def test_the_lists_are_homogenous():
     with pytest.raises(TypeError):
         Til(1, 2, "three")
+
+
+def test_child_types_are_fine():
+    child_element = ChildType()
+    assert child_element in Til(ParentType(), child_element, ParentType())
 
 
 def test_the_type_of_the_list_can_be_set_explicitly():
