@@ -36,6 +36,11 @@ def test_child_types_are_fine():
     assert child_element in Til(ParentType(), child_element, ParentType())
 
 
+def test_child_types_may_be_fine_but_parent_types_arent():
+    with pytest.raises(TypeError):
+        Til(ParentType(), element_type=ChildType)
+
+
 def test_the_type_of_the_list_can_be_set_explicitly():
     with pytest.raises(TypeError):
         Til("three", element_type=int)
