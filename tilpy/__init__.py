@@ -32,6 +32,12 @@ class Til(Generic[T]):
     def __contains__(self, x: T) -> bool:
         return x in self._contents
 
+    def __len__(self):
+        return len(self._contents)
+
+    def __reversed__(self):
+        return Til(*reversed(self._contents), element_type=self._type, skip_typing=True)
+
     def _assert_type(self, element: Any):
         if not isinstance(element, self._type):
             raise TypeError("Elements must all be the same type")

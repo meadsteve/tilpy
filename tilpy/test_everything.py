@@ -58,3 +58,11 @@ def test_tils_are_iterable():
 
 def test_tils_are_containers():
     assert 2 in Til(1, 2, 4)
+
+
+def test_tils_have_a_length():
+    assert len(Til(2, 7, 8)) == 3
+
+
+def test_tils_are_reversible():
+    assert reversed(Til(2, 7, 8)) == Til(8, 7, 2)
