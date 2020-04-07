@@ -10,6 +10,8 @@ class Til(Generic[T]):
 
     def __init__(self, *elements: T, element_type: Type[T] = None, skip_typing=False):
         self._contents = elements
+        if not element_type and len(elements) == 0:
+            raise SyntaxError("Empty TILs must have an explicit type")
         self._type = element_type or type(elements[0])
         if not skip_typing:
             for element in self._contents:
@@ -44,12 +46,17 @@ class Til(Generic[T]):
             raise TypeError("Elements must all be the same type")
 
 
-def til(*generators_or_items: Union[Generator[T, None, None], T], element_type: Type[T] = None) -> Til[T]:
+def til(*generator_or_items: Union[Generator[T, None, None], T], element_type: Type[T] = None) -> Til[T]:
+    if len(generator_or_items) == 0:
+        return Til(element_type=element_type)
+    if isinstance(generator_or_items[0], GeneratorType):
+        contents = []
+        for element in generator_or_items[0]:
+            contents.append(element)
+        return Til(*contents, element_type=element_type)
+    # The first item wasn't a generator so we'll treat them as
+    # a collection of elements to go in the list.
     contents = []
-    for source in generators_or_items:
-        if isinstance(source, GeneratorType):
-            for element in source:
-                contents.append(element)
-        else:
-            contents.append(source)
+    for source in generator_or_items:
+        contents.append(source)
     return Til(*contents, element_type=element_type)

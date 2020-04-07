@@ -19,3 +19,7 @@ def test_the_til_function_also_takes_elements():
 def test_the_til_function_also_passes_on_explicit_typing():
     with pytest.raises(TypeError):
         til(1, 2, 3, element_type=float)
+
+
+def test_the_til_function_can_start_empty():
+    assert til(element_type=float).as_list() == []

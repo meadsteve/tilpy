@@ -46,6 +46,11 @@ def test_the_type_of_the_list_can_be_set_explicitly():
         Til("three", element_type=int)
 
 
+def test_empty_lists_must_have_a_type():
+    with pytest.raises(SyntaxError):
+        Til()
+
+
 def test_new_elements_are_type_checked():
     start = Til(3)
     with pytest.raises(TypeError):
